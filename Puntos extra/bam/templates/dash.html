@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block libraries %}
+    <script src = "{% static 'lib/highcharts-8.1.2/highcharts.js' %}"></script>
+    <script src = "{% static 'lib/highcharts-8.1.2/modules/exporting.js' %}"></script>
+    <script src = "{% static 'lib/highcharts-8.1.2/modules/export-data.js' %}"></script>
+    <script src = "{% static 'lib/highcharts-8.1.2/modules/accessibility.js' %}"></script>
+{% endblock %}
+
+{%  block contenido %}
+    <div class="row" >
+        <!-- Left col -->
+        <div class="col-md-7" style="margin-top: 20px;margin-left: 40px;">
+            <figure class="highcharts-figure">
+                <div id="container"></div>
+                <p class="highcharts-description">
+                    
+                </p>
+            </figure>
+
+
+        </div>
+        <!-- /.col -->
+        <div class="col-xl-4 col-md-4" style="margin-top: 20px;margin-left: 20px;">
+            <figure class="highcharts-figure">
+              <div id="container2"></div>
+      
+            </figure>
+        </div>
+    </div>
+    <script type="application/javascript">
+        Highcharts.chart('container', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Total de productos vendidos por cada mes'
+            },
+            subtitle: {
+                text: 'Sacado de: BAM'
+            },
+            xAxis: {
+                categories: [
+                    'Ene',
+                    'Feb',
+                    'Mar',
+                    'ABr',
+                    'May',
+                    'Jun',
+                    'Jul',
+                    'Ago',
+                    'Sep',
+                    'Oct',
+                    'Nov',
+                    'Dic'
+                ],
+                crosshair: true
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: 'Ventas (En miles de quetzales)'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} </b></td></tr>',
+                footerFormat: '</table>',
+                shared: true,
+                useHTML: true
+            },
+            plotOptions: {
+                column: {
+                    pointPadding: 0.2,
+                    borderWidth: 0
+                }
+            },
+            series: {{ resumen|safe }}
+        });
+
+        console.log({{ resumen|safe }});
+    </script>
+    <script type="application/javascript">
+        Highcharts.chart('container2', {
+       
+           chart: {
+               plotBackgroundColor: null,
+               plotBorderWidth: null,
+               plotShadow: false,
+               type: 'pie'
+           },
+           title: {
+               text: 'Donde se vende más segun región'
+           },
+           tooltip: {
+               pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+           },
+           accessibility: {
+               point: {
+                   valueSuffix: '%'
+               }
+           },
+           plotOptions: {
+               pie: {
+                   allowPointSelect: true,
+                   cursor: 'pointer',
+                   dataLabels: {
+                       enabled: false
+                   },
+                   showInLegend: true
+               }
+           },
+           series: [{
+       
+               name: 'Porcentaje',
+               colorByPoint: true,
+               data: {{ data|safe }}
+           }]
+       });
+    </script>
+{% endblock %}

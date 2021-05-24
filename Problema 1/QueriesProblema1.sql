@@ -17,6 +17,16 @@ salesorderheader.customerid --Agrupamos por fecha y el cliente
 ORDER BY COUNT(salesorderdetail.productID) DESC, SUM(salesorderdetail.LineTotal) DESC --Ordenamos ascendentemente por detalle de venta y descendentemente por total
 LIMIT 3 --Obtenemos solo los top resultados
 
+-- INTENTO PARA EL INCISO 3
+select SUM(SalesOrderHeader.SubTotal) AS SUMA
+from salesorderheader join salesterritory ON salesorderheader.territoryID = salesterritory.territoryID
+inner join 
+(select TO_CHAR(salesorderheader.OrderDate,'YYYY-MM') AS MES, salesterritory.GROUPN AS GRUPO, 
+SUM(SalesOrderHeader.SubTotal) AS SUMA2
+from salesorderheader GROUP BY TO_CHAR(salesorderheader.OrderDate,'YYYY-MM'), salesterritory.GROUPN) AS SUB
+ON TO_CHAR(salesorderheader.OrderDate,'YYYY-MM') = SUB.MES
+GROUP BY TO_CHAR(salesorderheader.OrderDate,'YYYY-MM') 
+
 --INCISO 4
 
 --Seleccionamos solamente los valores unicos en codigo
@@ -41,6 +51,6 @@ SELECT TO_CHAR(T.OrderDate,'YYYY-MM') AS MES,T.CustomerID AS CLIENTE, MAX(T.Orde
 FROM salesorderheader T -- Importamos la tabla header con un alias
 GROUP BY TO_CHAR(T.OrderDate,'YYYY-MM'), T.CustomerID --agrupamos por mes y customer
 
---
+
 
 

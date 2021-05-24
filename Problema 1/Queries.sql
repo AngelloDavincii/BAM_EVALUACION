@@ -1,3 +1,4 @@
+--Queries para crear base de datos y tablas en postgres
 CREATE DATABASE BAM;
 
 CREATE TABLE datos_base_clientes(
@@ -125,84 +126,3 @@ CREATE TABLE SalesOrderHeader(
 );
 
 COPY salesorderheader FROM 'D:\00 BAM\BAM_EVALUACION\Data\Sales.SalesOrderHeader.csv' WITH (FORMAT CSV, DELIMITER ';', NULL 'NULL', HEADER);
-
---INCISO 1
-SELECT TO_CHAR(salesorderheader.ModifiedDate,'YYYY-MM'), salesterritory.Name, salesorderheader.Status,  
-COUNT(SalesOrderID), SUM(TotalDue)
-FROM salesorderheader JOIN salesterritory ON salesorderheader.territoryID = salesterritory.territoryID
-GROUP BY salesterritory.Name, salesorderheader.Status, TO_CHAR(salesorderheader.ModifiedDate,'YYYY-MM')
-
--- INCISO 2
-SELECT TO_CHAR(salesorderheader.OrderDate,'YYYY-MM'),salesorderheader.customerid, salesorderdetail.productID,
-COUNT(salesorderdetail.productID), SUM(salesorderdetail.LineTotal)
-FROM salesorderheader JOIN salesorderdetail ON salesorderheader.salesorderid = salesorderdetail.salesorderid
-WHERE salesorderheader.status = 2
-GROUP BY salesorderdetail.productID,TO_CHAR(salesorderheader.OrderDate,'YYYY-MM'),
-salesorderheader.customerid
-ORDER BY COUNT(salesorderdetail.productID) DESC, SUM(salesorderdetail.LineTotal) DESC
-LIMIT 3
-
---INCISO 3
-SELECT TO_CHAR(salesorderheader.OrderDate,'YYYY-MM'), SalesTerritory.Groupn AS Group,
-AVG(salesorderheader.subtotal),SUM(salesorderheader.subtotal),
-
-(SELECT SUM(salesorderheader.subtotal) FROM salesorderheader GROUP BY salesorderheader.Order)
-
-FROM salesorderheader JOIN salesterritory ON salesorderheader.TerritoryID =salesterritory.TerritoryID
-GROUP BY TO_CHAR(salesorderheader.OrderDate,'YYYY-MM'), SalesTerritory.Groupn
-
---INCISO 4
-select distinct l1.codigo as ConsecutiveNums
-from 
-secuencial l1, 
-secuencial l2, 
-secuencial l3
-where l1.secuencial = l2.secuencial-1
-and l2.secuencial = l3.secuencial-1
-and l1.codigo=l2.codigo
-and l2.codigo=l3.codigo
-
---INCISO 5
-SELECT TO_CHAR(T.OrderDate,'YYYY-MM') AS MES,T.CustomerID AS CLIENTE, MAX(T.OrderDate) AS FechaUltCompra, 
-			(MAX(T.OrderDate) - 
-			(SELECT MAX(N.OrderDate) FROM salesorderheader N WHERE
-            N.customerid = T.customerid AND
-            N.OrderDate < MAX(T.OrderDate))) AS DIASUC_PC,
-			((SELECT MAX(N.OrderDate) FROM salesorderheader N WHERE
-            N.customerid = T.customerid AND
-            N.OrderDate < MAX(T.OrderDate))
-			-
-			(SELECT N.Orderdate FROM salesorderheader N
-			WHERE N.customerid = T.customerid
-			ORDER BY N.salesorderid DESC
-			limit 1 offset 2 rows 
-			)) AS DiasPC_APC
-
-FROM salesorderheader T
-GROUP BY TO_CHAR(T.OrderDate,'YYYY-MM'), T.CustomerID
-
---ddddddddddddddddddddddddddddddddddddddddddddddd
-SELECT TO_CHAR(salesorderheader.OrderDate,'YYYY-MM'), SalesTerritory.Groupn AS Group,
-AVG(salesorderheader.subtotal),SUM(salesorderheader.subtotal),
-
-(SELECT SUM(salesorderheader.subtotal) FROM salesorderheader GROUP BY salesorderheader.Order)
-
-FROM salesorderheader JOIN salesterritory ON salesorderheader.TerritoryID =salesterritory.TerritoryID
-GROUP BY TO_CHAR(salesorderheader.OrderDate,'YYYY-MM'), SalesTerritory.Groupn
-
-
-29992
-
-select fecha,sum(campo1) 
-from
-(
-select fecha,campo1
-from ejemplo1
-union all
-select fecha,campo2
-from ejemplo2
-union all
-select fecha,campo3
-from ejemplo3
-) t
-group by fecha
